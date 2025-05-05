@@ -6,6 +6,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ExpensesModule } from './expense/expense.module';
+import { IncomeModule } from './income/income.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ExpensesModule } from './expense/expense.module';
     AuthModule,
     CategoriesModule,
     ExpensesModule,
+    IncomeModule,
   ],
 })
 export class AppModule {}
