@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ExpensesModule } from './expense/expense.module';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { CategoriesModule } from './categories/categories.module';
         database: configService.get<string>('DB_NAME'),
         synchronize: configService.get('NODE_ENV') === 'development',
         namingStrategy: new SnakeNamingStrategy(),
-        entities: ['src/entities/*.ts'],
+        entities: ['src/**/*.entity.ts'],
         migrations:
           process.env.NODE_ENV === 'development'
             ? ['src/migrations/*.ts']
@@ -37,6 +38,7 @@ import { CategoriesModule } from './categories/categories.module';
     UserModule,
     AuthModule,
     CategoriesModule,
+    ExpensesModule,
   ],
 })
 export class AppModule {}

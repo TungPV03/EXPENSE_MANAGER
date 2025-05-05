@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: process.env.NODE_ENV === 'development',
   namingStrategy: new SnakeNamingStrategy(),
-  entities: ['src/entities/*.ts'],
+  entities: ['src/**/*.entity.ts'],
   migrations: ['src/migrations/*.ts'],
   subscribers: [],
   timezone: 'Z',
