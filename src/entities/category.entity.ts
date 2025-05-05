@@ -11,7 +11,7 @@ export class Category {
   id: number;
 
   @Column({ type: 'varchar', length: 100 })
-  name: string;
+  title: string;
 
   @Column({
     type: 'enum',
@@ -21,9 +21,6 @@ export class Category {
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   icon: string;
-
-  @Column({ type: 'varchar', length: 20, nullable: true })
-  color: string;
 
   @CreateDateColumn()
   created_at: Date;
