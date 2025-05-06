@@ -13,11 +13,12 @@ import {
 import { IncomeService } from './income.service';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/gaurd/jwt-auth.gaurd';
 
 @ApiTags('Income')
 @Controller('income')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class IncomeController {
   constructor(private readonly incomesService: IncomeService) {}

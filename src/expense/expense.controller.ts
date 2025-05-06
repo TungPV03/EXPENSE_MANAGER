@@ -11,13 +11,14 @@ import {
 } from '@nestjs/common';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ExpensesService } from './expense.service';
 import { JwtAuthGuard } from 'src/gaurd/jwt-auth.gaurd';
 
 @ApiTags('expenses')
 @Controller('expenses')
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
