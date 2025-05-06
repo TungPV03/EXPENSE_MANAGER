@@ -6,17 +6,24 @@ import { Repository } from 'typeorm';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
 import { User } from 'src/entities/user.entity';
+import { Category } from 'src/entities/category.entity';
 
 @Injectable()
 export class IncomeService {
   constructor(
     @InjectRepository(Income)
     private incomeRepo: Repository<Income>,
+
+    @InjectRepository(Category)
+    private categoryRepo: Repository<Category>,
   ) {}
 
-  create(dto: CreateIncomeDto, user: User) {
+  async create(dto: CreateIncomeDto, user: User) {
+    const category = await this.categoryRepo.findOneBy({ id: dto.categoryId });
+    if (!category) throw new NotFoundException('Category not found');
     const income = this.incomeRepo.create({
       ...dto,
+      category,
       user,
     });
     return this.incomeRepo.save(income);
