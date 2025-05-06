@@ -17,36 +17,37 @@ export class BudgetService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createBudgetDto: CreateBudgetDto): Promise<Budget> {
-    const user = await this.userRepository.findOne({
-      where: { id: createBudgetDto.userId },
-    });
-    if (!user) throw new NotFoundException('User not found');
-
+  async create(dto: CreateBudgetDto, user: User): Promise<Budget> {
     const budget = this.budgetRepository.create({
-      ...createBudgetDto,
+      ...dto,
       user,
     });
     return this.budgetRepository.save(budget);
   }
 
-  findAll(): Promise<Budget[]> {
-    return this.budgetRepository.find();
+  findAll(user: User): Promise<Budget[]> {
+    return this.budgetRepository.find({
+      where: { user: { id: user.id } },
+      order: { year: 'DESC', month: 'DESC' },
+    });
   }
 
-  findOne(id: number): Promise<Budget> {
-    return this.budgetRepository.findOne({ where: { id } });
-  }
-
-  async update(id: number, dto: UpdateBudgetDto): Promise<Budget> {
-    const budget = await this.budgetRepository.findOne({ where: { id } });
+  async findOne(id: number, user: User): Promise<Budget> {
+    const budget = await this.budgetRepository.findOne({
+      where: { id, user: { id: user.id } },
+    });
     if (!budget) throw new NotFoundException('Budget not found');
+    return budget;
+  }
 
-    const updated = Object.assign(budget, dto);
+  async update(id: number, dto: UpdateBudgetDto, user: User): Promise<Budget> {
+    const budget = await this.findOne(id, user);
+    const updated = this.budgetRepository.merge(budget, dto);
     return this.budgetRepository.save(updated);
   }
 
-  async remove(id: number): Promise<void> {
-    await this.budgetRepository.delete(id);
+  async remove(id: number, user: User): Promise<void> {
+    const budget = await this.findOne(id, user);
+    await this.budgetRepository.remove(budget);
   }
 }

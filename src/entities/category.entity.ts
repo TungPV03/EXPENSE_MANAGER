@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { User } from './user.entity';
 
 export enum TransactionType {
   INCOME = 'INCOME',
@@ -12,6 +13,10 @@ export class Category {
 
   @Column({ type: 'varchar', length: 100 })
   title: string;
+
+  @ManyToOne(() => User, { eager: true, nullable: false })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @Column({
     type: 'enum',

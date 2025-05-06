@@ -5,6 +5,7 @@ import { Income } from './entities/income.entity';
 import { Repository } from 'typeorm';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
+import { User } from 'src/entities/user.entity';
 
 @Injectable()
 export class IncomeService {
@@ -13,29 +14,45 @@ export class IncomeService {
     private incomeRepo: Repository<Income>,
   ) {}
 
-  create(createIncomeDto: CreateIncomeDto) {
-    const income = this.incomeRepo.create(createIncomeDto);
+  create(dto: CreateIncomeDto, user: User) {
+    const income = this.incomeRepo.create({
+      ...dto,
+      user,
+    });
     return this.incomeRepo.save(income);
   }
 
-  findAll() {
-    return this.incomeRepo.find();
+  findAll(user: User) {
+    return this.incomeRepo.find({
+      where: { user: { id: user.id } },
+    });
   }
 
-  findOne(id: number) {
-    return this.incomeRepo.findOne({ where: { id } });
-  }
-
-  async update(id: number, dto: UpdateIncomeDto) {
-    const income = await this.incomeRepo.preload({
-      id,
-      ...dto,
+  async findOne(id: number, user: User) {
+    const income = await this.incomeRepo.findOne({
+      where: { id, user: { id: user.id } },
     });
     if (!income) throw new NotFoundException('Income not found');
+    return income;
+  }
+
+  async update(id: number, dto: UpdateIncomeDto, user: User) {
+    const income = await this.incomeRepo.findOne({
+      where: { id, user: { id: user.id } },
+    });
+    if (!income) throw new NotFoundException('Income not found');
+
+    Object.assign(income, dto);
     return this.incomeRepo.save(income);
   }
 
-  remove(id: number) {
-    return this.incomeRepo.delete(id);
+  async remove(id: number, user: User) {
+    const income = await this.incomeRepo.findOne({
+      where: { id, user: { id: user.id } },
+    });
+    if (!income) throw new NotFoundException('Income not found');
+
+    await this.incomeRepo.remove(income);
+    return { deleted: true };
   }
 }

@@ -4,10 +4,6 @@ import { IsInt, IsNumber, Min, Max } from 'class-validator';
 
 export class CreateBudgetDto {
   @ApiProperty()
-  @IsInt()
-  userId: number;
-
-  @ApiProperty()
   @IsNumber()
   amount: number;
 
