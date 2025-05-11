@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto, UserDto } from 'src/dto/user.dto';
 import { User } from 'src/entities/user.entity';
@@ -74,6 +74,14 @@ export class UserRepo {
     const user = await this.userRepository.findOne({ where: conditions });
     if (!user) {
       throw new NotFoundException(`User not found`);
+    }
+    return user;
+  }
+
+  async verifyEmailAndUsername(condition: any){
+    const user = await this.userRepository.findOne({ where: condition });
+    if (user) {
+      throw new ConflictException(`Email or username already exists`);
     }
     return user;
   }

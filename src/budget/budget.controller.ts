@@ -10,6 +10,7 @@ import {
   UseGuards,
   Query,
   ParseIntPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { BudgetService } from './budget.service';
@@ -35,6 +36,26 @@ export class BudgetController {
     @Query('year', ParseIntPipe) year?: number,
   ) {
     return this.budgetAnalyticsService.getBudgetOverview(req.user.id, month, year);
+  }
+
+  @Get('overview-range')
+  async findBudgetOverviewByRange(
+    @Req() req,
+    @Query('startDate') startDateStr: string,
+    @Query('endDate') endDateStr: string,
+  ) {
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      throw new BadRequestException('Invalid date format. Use YYYY-MM-DD');
+    }
+
+    return this.budgetAnalyticsService.getBudgetOverviewByRange(
+      req.user.id,
+      startDate,
+      endDate,
+    );
   }
 
   @Post()

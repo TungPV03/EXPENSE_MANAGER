@@ -2,7 +2,7 @@ import { Controller, Post, Body, Request, UseGuards, HttpException, HttpStatus }
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from 'src/gaurd/jwt-auth.gaurd';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { LoginDto } from 'src/dto/user.dto';
+import { LoginDto, UserDto } from 'src/dto/user.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -27,19 +27,15 @@ export class AuthController {
     return this.authService.login(user);
   }
 
-  @Post('login-admin')
-  async loginAdmin(@Body() body: any) {
-    const user = await this.authService.validateAdmin(
-      body.username,
-      body.password,
-    );
-    if (!user) {
-      throw new HttpException(
-        { message: 'Invalid username or password' },
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-    return this.authService.login(user);
+  @ApiOperation({ summary: 'Register user' })
+  @ApiResponse({
+    status: 201,
+    description: 'User register successfully',
+  })
+  @ApiBody({ type: UserDto })
+  @Post('register')
+  register(@Body() userDto: UserDto) {
+    return this.authService.register(userDto);
   }
 
   @ApiOperation({ summary: 'Refresh token' })

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Budget } from 'src/budget/entities/budget.entity';
 import { Expense } from 'src/expense/entities/expense.entity';
 import { Income } from 'src/income/entities/income.entity';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 
 @Injectable()
 export class BudgetAnalyticsService {
@@ -75,6 +75,72 @@ export class BudgetAnalyticsService {
       totalIncome,
       totalExpense,
       currentAmount: budgetAmount + totalIncome - totalExpense,
+    };
+  }
+
+  async getTotalIncomeByRange(
+    userId: number,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<number> {
+    const result = await this.incomeRepo
+      .createQueryBuilder('income')
+      .select('SUM(income.amount)', 'sum')
+      .where('income.user_id = :userId', { userId })
+      .andWhere('income.date BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
+      .getRawOne();
+
+    return Number(result.sum) || 0;
+  }
+
+  async getTotalExpenseByRange(
+    userId: number,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<number> {
+    const result = await this.expenseRepo
+      .createQueryBuilder('expense')
+      .select('SUM(expense.amount)', 'sum')
+      .where('expense.user_id = :userId', { userId })
+      .andWhere('expense.date BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
+      .getRawOne();
+
+    return Number(result.sum) || 0;
+  }
+
+  // Gộp lại để trả kết quả tương tự như getBudgetOverview
+  async getBudgetOverviewByRange(
+    userId: number,
+    startDate: Date,
+    endDate: Date,
+  ) {
+    const [totalIncome, totalExpense] = await Promise.all([
+      this.getTotalIncomeByRange(userId, startDate, endDate),
+      this.getTotalExpenseByRange(userId, startDate, endDate),
+    ]);
+
+    // Budget là theo tháng, nên trong khoảng thời gian bạn có thể cộng tất cả các budget liên quan
+    const budgets = await this.budgetRepo.find({
+      where: {
+        user: { id: userId },
+        year: Between(startDate.getFullYear(), endDate.getFullYear()),
+        month: Between(startDate.getMonth() + 1, endDate.getMonth() + 1),
+      },
+    });
+
+    const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
+
+    return {
+      budgetedAmount: totalBudget,
+      totalIncome,
+      totalExpense,
+      currentAmount: totalBudget + totalIncome - totalExpense,
     };
   }
 }

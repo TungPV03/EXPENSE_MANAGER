@@ -14,9 +14,9 @@ export class UserDto {
   @IsString()
   password: string;
 
-  @ApiProperty({ description: 'Admin status', example: false })
-  @IsBoolean()
-  isAdmin: boolean;
+  // @ApiProperty({ description: 'Admin status', example: false })
+  // @IsBoolean()
+  // isAdmin: boolean;
 
   @ApiProperty({ description: 'Username', example: 'johndoe' })
   @IsString()
