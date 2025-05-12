@@ -16,9 +16,9 @@ export class GoalService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createGoalDTO: CreateGoalDto): Promise<Goal> {
+  async create(createGoalDTO: CreateGoalDto, userId: number): Promise<Goal> {
     const user = await this.userRepository.findOne({
-      where: { id: createGoalDTO.userId },
+      where: { id: userId },
     });
     if (!user) throw new NotFoundException('User not found');
 
@@ -29,8 +29,11 @@ export class GoalService {
     return this.goalRepository.save(goal);
   }
 
-  findAll(): Promise<Goal[]> {
-    return this.goalRepository.find();
+  findAll(userId: number): Promise<Goal[]> {
+    return this.goalRepository.find({
+      where: { user: { id: userId } },
+      relations: ['user'],
+    });
   }
 
   findOne(id: number): Promise<Goal> {

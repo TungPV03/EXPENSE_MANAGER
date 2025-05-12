@@ -3,10 +3,6 @@ import { IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
 
 export class CreateGoalDto {
   @ApiProperty()
-  @IsNumber()
-  userId: number;
-
-  @ApiProperty()
   @IsString()
   title: string;
 

@@ -6,39 +6,58 @@ import {
   Param,
   Delete,
   Put,
+  UseGuards,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GoalService } from './goal.service';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { UpdateGoalDto } from './dto/update-goal.dto';
+import { JwtAuthGuard } from 'src/gaurd/jwt-auth.gaurd';
 
 @ApiTags('Goal')
 @Controller('goal')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth() 
 export class GoalController {
   constructor(private readonly goalService: GoalService) {}
 
   @Post()
-  create(@Body() dto: CreateGoalDto) {
-    return this.goalService.create(dto);
+  @ApiOperation({ summary: 'Create a new goal' })
+  create(@Body() dto: CreateGoalDto, @Req() req: any) {
+    if(!req.user) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    console.log('User ID:', req.user.id);
+    console.log('Request Body:', dto);
+    return this.goalService.create(dto, req.user.id);
   }
 
   @Get()
-  findAll() {
-    return this.goalService.findAll();
+  @ApiOperation({ summary: 'Get all goals for the authenticated user' })
+  findAll(@Req() req: any) {
+    if(!req.user) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.goalService.findAll(req.user.id);
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get a goal by ID' })
   findOne(@Param('id') id: string) {
     return this.goalService.findOne(+id);
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Update a goal by ID' })
   update(@Param('id') id: string, @Body() dto: UpdateGoalDto) {
     return this.goalService.update(+id, dto);
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete a goal by ID' })
   remove(@Param('id') id: string) {
     return this.goalService.remove(+id);
   }
