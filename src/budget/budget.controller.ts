@@ -37,6 +37,14 @@ export class BudgetController {
   ) {
     return this.budgetAnalyticsService.getBudgetOverview(req.user.id, month, year);
   }
+  @Get('entries')
+  getLastestEntries(
+    @Req() req,
+    @Query('month', ParseIntPipe) month?: number,
+    @Query('year', ParseIntPipe) year?: number,
+  ) {
+    return this.budgetAnalyticsService.getLastestEntries(req.user.id, month, year);
+  }
 
   @Get('overview-range')
   async findBudgetOverviewByRange(

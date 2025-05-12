@@ -143,4 +143,22 @@ export class BudgetAnalyticsService {
       currentAmount: totalBudget + totalIncome - totalExpense,
     };
   }
+  async getLastestEntries(userId: number, month: number, year: number) {
+    const query = `
+    (SELECT id, date, title, amount, 'income' AS entry_type 
+     FROM incomes 
+     WHERE user_id = ? AND EXTRACT(MONTH FROM date) = ? AND EXTRACT(YEAR FROM date) = ?)
+    UNION
+    (SELECT id, date, title, amount, 'expense' AS entry_type 
+     FROM expenses
+     WHERE user_id = ? AND EXTRACT(MONTH FROM date) = ? AND EXTRACT(YEAR FROM date) = ?)
+    ORDER BY date DESC
+    LIMIT 5
+  `;
+  
+    // Thực thi truy vấn SQL với các tham số trong mảng
+    const latestEntries = await this.incomeRepo.manager.query(query, [userId, month, year, userId, month, year]);
+  
+    return latestEntries;
+  }
 }
