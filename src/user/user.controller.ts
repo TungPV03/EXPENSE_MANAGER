@@ -7,23 +7,56 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { QueryUserDto, UpdateUserDto, UserDto } from 'src/dto/user.dto';
 import { JwtAuthGuard } from 'src/gaurd/jwt-auth.gaurd';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadService } from 'src/common-services/upload.service';
+import { Express } from 'express';
 
 @ApiTags('users')
 @ApiBearerAuth()
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly uploadService: UploadService
+  ) {}
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadToCloudinary(@UploadedFile() file: Express.Multer.File) {
+    const url = await this.uploadService.uploadImage(
+      file.buffer,
+      file.originalname,
+    );
+    return { url };
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Get list of users' })
-  @ApiResponse({ status: 200, description: 'Return list of users successfully.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return list of users successfully.',
+  })
   async getManyUsers(@Query() query: QueryUserDto) {
     return this.userService.getListUsers(query);
   }
