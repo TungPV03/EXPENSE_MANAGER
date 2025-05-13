@@ -6,6 +6,11 @@ export class CreateIncomeDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
+  date: Date;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
   title: string;
 
   @ApiProperty()
