@@ -3,6 +3,11 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateExpenseDto {
   @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  date: Date;
+
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   title: string;
