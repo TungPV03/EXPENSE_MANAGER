@@ -5,7 +5,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany
 } from 'typeorm';
+
+import { Budget } from 'src/budget/entities/budget.entity';
 
 @Entity()
 export class User {
@@ -41,4 +44,7 @@ export class User {
 
   @Column({ nullable: true })
   avatar: string;
+
+  @OneToMany(() => Budget, (budget) => budget.user)
+  budgets: Budget[];
 }
