@@ -22,3 +22,13 @@ export class CreateGoalDto {
   @IsDateString()
   deadline: string; // ISO format date string (e.g., "2025-12-31")
 }
+
+export class AddToGoalDto {
+  @ApiProperty()
+  @IsNumber()
+  amount: number;
+
+  @ApiProperty()
+  @IsString()
+  goalId: number; // ID of the goal to which the amount is being added
+}

@@ -64,10 +64,11 @@ export class BudgetAnalyticsService {
   }
 
   async getBudgetOverview(userId: number, month: number, year: number) {
-    const [budgetAmount, totalIncome, totalExpense] = await Promise.all([
+    const [budgetAmount, totalIncome, totalExpense, entries] = await Promise.all([
       this.getTotalBudget(userId, month, year),
       this.getTotalIncome(userId, month, year),
       this.getTotalExpense(userId, month, year),
+      this.getLastestEntries(userId, month, year),
     ]);
 
     return {
@@ -75,6 +76,7 @@ export class BudgetAnalyticsService {
       totalIncome,
       totalExpense,
       currentAmount: budgetAmount + totalIncome - totalExpense,
+      entries,
     };
   }
 
