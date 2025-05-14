@@ -8,7 +8,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateExpenseDto {
-  @ApiProperty()
+  @ApiProperty() //{ type: String, format: 'date' }
   @IsNotEmpty()
   @IsString()
   date: Date;
@@ -26,9 +26,4 @@ export class CreateExpenseDto {
   @ApiProperty({ description: 'ID of the category' })
   @IsNumber()
   categoryId: number;
-
-  @ApiProperty({ type: String, format: 'date' }) // Swagger UI hiển thị đúng định dạng ngày
-  @IsNotEmpty()
-  @IsDateString()
-  date: Date;
 }
