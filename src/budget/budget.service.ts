@@ -6,6 +6,8 @@ import { Budget } from './entities/budget.entity';
 import { CreateBudgetDto } from './dto/create-budget.dto';
 import { UpdateBudgetDto } from './dto/update-budget.dto';
 import { User } from 'src/entities/user.entity';
+import { BadRequestException } from '@nestjs/common';
+
 
 @Injectable()
 export class BudgetService {
@@ -18,6 +20,13 @@ export class BudgetService {
   ) {}
 
   async create(dto: CreateBudgetDto, user: User): Promise<Budget> {
+    // Kiểm tra budget đã tồn tại cho tháng/năm này chưa
+    const existed = await this.budgetRepository.findOne({
+      where: { user: { id: user.id }, month: dto.month, year: dto.year },
+    });
+    if (existed) {
+      throw new BadRequestException('A budget for this month already exists!');
+    }
     const budget = this.budgetRepository.create({
       ...dto,
       user,
