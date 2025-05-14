@@ -29,6 +29,6 @@ export class AddToGoalDto {
   amount: number;
 
   @ApiProperty()
-  @IsString()
+  @IsNumber()
   goalId: number; // ID of the goal to which the amount is being added
 }
