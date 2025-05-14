@@ -32,18 +32,35 @@ export class BudgetController {
   @Get('overview')
   findBudgetOverview(
     @Req() req,
-    @Query('month', ParseIntPipe) month?: number,
-    @Query('year', ParseIntPipe) year?: number,
+    @Query('month') monthRaw?: string,
+    @Query('year') yearRaw?: string,
   ) {
-    return this.budgetAnalyticsService.getBudgetOverview(req.user.id, month, year);
+    const now = new Date();
+    const month = monthRaw ? parseInt(monthRaw, 10) : now.getMonth() + 1;
+    const year = yearRaw ? parseInt(yearRaw, 10) : now.getFullYear();
+
+    return this.budgetAnalyticsService.getBudgetOverview(
+      req.user.id,
+      month,
+      year,
+    );
   }
+
   @Get('entries')
   getLastestEntries(
     @Req() req,
-    @Query('month', ParseIntPipe) month?: number,
-    @Query('year', ParseIntPipe) year?: number,
+    @Query('month') monthRaw?: string,
+    @Query('year') yearRaw?: string,
   ) {
-    return this.budgetAnalyticsService.getLastestEntries(req.user.id, month, year);
+    const now = new Date();
+    const month = monthRaw ? parseInt(monthRaw, 10) : now.getMonth() + 1;
+    const year = yearRaw ? parseInt(yearRaw, 10) : now.getFullYear();
+
+    return this.budgetAnalyticsService.getLastestEntries(
+      req.user.id,
+      month,
+      year,
+    );
   }
 
   @Get('overview-range')

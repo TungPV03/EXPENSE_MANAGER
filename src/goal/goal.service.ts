@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Goal } from './entities/goal.entity';
-import { CreateGoalDto } from './dto/create-goal.dto';
+import { AddToGoalDto, CreateGoalDto } from './dto/create-goal.dto';
 import { UpdateGoalDto } from './dto/update-goal.dto';
 import { User } from 'src/entities/user.entity';
 
@@ -50,5 +50,40 @@ export class GoalService {
 
   async remove(id: number): Promise<void> {
     await this.goalRepository.delete(id);
+  }
+
+  async getAllGoalsOverviewByUserId(userId: number): Promise<any> {
+    const goals = await this.goalRepository.find({
+      where: {
+        user: { id: userId },
+      },
+      relations: ['user'],
+    });
+
+    const totalGoals = goals.reduce(
+      (acc, goal) => acc + goal.targetAmount,
+      0,
+    );
+    const totalCurrentAmount = goals.reduce(
+      (acc, goal) => acc + goal.currentAmount,
+      0,
+    );
+    const totalRemainingAmount = totalGoals - totalCurrentAmount;
+
+    return {
+      totalGoals,
+      totalCurrentAmount,
+      totalRemainingAmount,
+    }
+  }
+
+  async addToGoal(dto: AddToGoalDto, userId: number): Promise<Goal> {
+    const goal = await this.goalRepository.findOne({
+      where: { id: Number(dto.goalId), user: { id: userId } },
+    });
+    if (!goal) throw new NotFoundException('Goal not found');
+
+    goal.currentAmount += dto.amount;
+    return this.goalRepository.save(goal);
   }
 }
