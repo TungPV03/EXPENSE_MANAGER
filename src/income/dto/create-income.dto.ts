@@ -1,5 +1,5 @@
 // create-income.dto.ts
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsDateString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateIncomeDto {
@@ -22,4 +22,9 @@ export class CreateIncomeDto {
   @IsNotEmpty()
   @IsNumber()
   categoryId: number;
+
+  @ApiProperty({ type: String, format: 'date' }) // Swagger UI hiển thị đúng định dạng ngày
+  @IsNotEmpty()
+  @IsDateString()
+  date: Date;
 }
